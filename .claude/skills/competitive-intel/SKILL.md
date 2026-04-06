@@ -1,91 +1,76 @@
 ---
 name: competitive-intel
-description: Research and analyze competitors, market positioning, product comparisons, and strategic landscape. Produces structured competitive intelligence briefs.
+description: Conduct competitive analysis using SWOT, Porter's Five Forces, and market positioning frameworks. Research competitors and strategic landscape.
 allowed-tools: Read Grep Glob Bash WebFetch WebSearch
-argument-hint: [competitor name, market, product, or strategic question]
+argument-hint: [company, market, competitor, or strategic question]
 ---
 
-# Competitive Intelligence & Market Analysis
+# Competitive Intelligence & Strategic Analysis
 
-You produce structured competitive intelligence that drives strategic decisions.
+You produce structured competitive intelligence that supports strategic decision-making.
 
-## Process
+## Analysis Frameworks
 
-1. **Research** — Gather available data on competitors and market
-2. **Map** — Position competitors on key dimensions
-3. **Analyze** — Identify strengths, weaknesses, opportunities, threats
-4. **Recommend** — Surface strategic implications and action items
+### SWOT Analysis
 
-## Output Format
+#### SWOT: [Company/Product]
 
-### Competitive Intelligence Brief: [Company/Product/Market]
-**Date:** [Date]
-**Scope:** [What this covers]
+|  | **Helpful** | **Harmful** |
+|--|-------------|-------------|
+| **Internal** | **Strengths** | **Weaknesses** |
+|  | - [strength 1] | - [weakness 1] |
+|  | - [strength 2] | - [weakness 2] |
+| **External** | **Opportunities** | **Threats** |
+|  | - [opportunity 1] | - [threat 1] |
+|  | - [opportunity 2] | - [threat 2] |
 
----
+**Strategic Implications:**
+- [Strength + Opportunity → Offensive strategy]
+- [Weakness + Threat → Defensive priority]
 
-#### Market Overview
-- **Market size:** [TAM/SAM/SOM if available]
-- **Growth rate:** [YoY trend]
-- **Key trends:** [3-5 bullet points on where the market is heading]
-- **Regulatory landscape:** [Relevant regulations or pending changes]
+### Porter's Five Forces
 
-#### Competitor Profiles
+| Force | Intensity | Key Factors | Implication |
+|-------|-----------|-------------|-------------|
+| Rivalry among competitors | H/M/L | [factors] | [what it means for you] |
+| Threat of new entrants | H/M/L | [barriers to entry] | ... |
+| Threat of substitutes | H/M/L | [alternatives available] | ... |
+| Buyer power | H/M/L | [switching costs, concentration] | ... |
+| Supplier power | H/M/L | [dependency, alternatives] | ... |
 
-**[Competitor A]**
-| Dimension | Details |
-|-----------|---------|
-| **Positioning** | [How they describe themselves] |
-| **Target customer** | [Who they sell to] |
-| **Key products** | [Core offerings] |
-| **Pricing** | [Model and approximate price points] |
-| **Strengths** | [2-3 genuine advantages] |
-| **Weaknesses** | [2-3 real vulnerabilities] |
-| **Recent moves** | [Last 6 months: launches, hires, funding, partnerships] |
-| **Estimated size** | [Revenue/employees/customers if available] |
+**Overall industry attractiveness:** [Assessment]
 
-[Repeat for each competitor]
+### Competitive Landscape Map
 
-#### Competitive Landscape Map
+| Competitor | Market Position | Key Differentiator | Target Segment | Pricing | Strengths | Weaknesses | Recent Moves |
+|------------|----------------|-------------------|----------------|---------|-----------|------------|-------------|
+| [Name] | Leader/Challenger/Niche | ... | ... | $$$ | ... | ... | ... |
 
-| Capability | Us | Competitor A | Competitor B | Competitor C |
-|-----------|-----|-------------|-------------|-------------|
-| [Feature/Dimension 1] | ⬤/◐/○ | ⬤/◐/○ | ⬤/◐/○ | ⬤/◐/○ |
-| [Feature/Dimension 2] | ⬤/◐/○ | ⬤/◐/○ | ⬤/◐/○ | ⬤/◐/○ |
-| **Pricing** | $$$ | $$ | $$$$ | $ |
-| **Market share** | ...% | ...% | ...% | ...% |
+### Market Positioning
 
-⬤ = Strong | ◐ = Moderate | ○ = Weak/Missing
+**Positioning Map Dimensions:** [e.g., Price vs. Quality, Enterprise vs. SMB, Feature-rich vs. Simple]
 
-#### SWOT Analysis (Our Position)
+**Our current position:** [Where we sit]
+**Desired position:** [Where we want to be]
+**Gap:** [What needs to change to get there]
 
-| | Helpful | Harmful |
-|---|---------|---------|
-| **Internal** | **Strengths:** [list] | **Weaknesses:** [list] |
-| **External** | **Opportunities:** [list] | **Threats:** [list] |
+## Deliverable Options
 
-#### Strategic Implications
+Based on the request, deliver one or more of:
 
-1. **Differentiation opportunity:** [Where we can win that others can't easily copy]
-2. **Competitive risk:** [Where we're most vulnerable and what to do about it]
-3. **Market gap:** [Unserved need that no competitor addresses well]
-4. **Timing consideration:** [Windows opening or closing]
+1. **Quick Competitive Brief** — Single competitor deep-dive (1 page)
+2. **Landscape Overview** — Full market map with all key players
+3. **Strategic Recommendation** — Analysis + recommended response with action plan
+4. **Battle Card** — Sales-ready competitive positioning doc
+5. **Market Entry Assessment** — Should we enter this market? Analysis with go/no-go recommendation
 
-#### Recommended Actions
+## Research Process
 
-| Priority | Action | Rationale | Effort | Impact |
-|----------|--------|-----------|--------|--------|
-| 1 | ... | ... | H/M/L | H/M/L |
-| 2 | ... | ... | H/M/L | H/M/L |
-| 3 | ... | ... | H/M/L | H/M/L |
-
-#### Sources & Confidence
-
-| Claim | Source | Confidence |
-|-------|--------|-----------|
-| [Key data point] | [Where this came from] | High/Medium/Low |
-
-**Note:** Flag clearly where data is estimated, inferred, or potentially outdated.
+1. Use WebSearch to gather current market data and competitor information
+2. Cross-reference multiple sources for accuracy
+3. Flag information age — competitive intel degrades fast
+4. Distinguish facts from analyst opinions
+5. Always include "Last Updated" date and confidence level
 
 ## Input
 
