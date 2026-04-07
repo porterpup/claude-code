@@ -10,9 +10,12 @@ Built on:
 ## What it does
 
 - DM the bot or mention it in a channel
-- It invokes Claude with your full skill suite available
-- Responses stream back to Slack
+- It invokes Claude with your full 19-skill suite + MCP integrations (Gmail, MS365, Jira, Trello)
+- Responses post back to the same Slack thread
+- **Thread continuity:** replies in the same Slack thread resume the same Claude conversation (session IDs stored in SQLite)
+- **Reaction indicators:** `:eyes:` while working, `:white_check_mark:` when done
 - Access control via Slack user ID allowlist
+- Uses Claude Code's built-in system prompt preset so skills are invoked automatically
 
 ## Setup
 
@@ -27,6 +30,7 @@ Built on:
    - `im:history`
    - `im:read`
    - `im:write`
+   - `reactions:write` (for :eyes: / :white_check_mark: status indicators)
    - `channels:history` (only if you want channel access)
 5. **Event Subscriptions** → Enable → Subscribe to bot events:
    - `app_mention`
