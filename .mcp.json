@@ -18,6 +18,27 @@
     "ms365": {
       "command": "npx",
       "args": ["-y", "@softeria/ms-365-mcp-server"]
+    },
+    "atlassian": {
+      "command": "uvx",
+      "args": ["mcp-atlassian"],
+      "env": {
+        "JIRA_URL": "",
+        "JIRA_USERNAME": "",
+        "JIRA_API_TOKEN": "",
+        "CONFLUENCE_URL": "",
+        "CONFLUENCE_USERNAME": "",
+        "CONFLUENCE_API_TOKEN": ""
+      }
+    },
+    "trello": {
+      "command": "npx",
+      "args": ["-y", "@delorenj/mcp-server-trello"],
+      "env": {
+        "TRELLO_API_KEY": "",
+        "TRELLO_TOKEN": "",
+        "TRELLO_BOARD_ID": ""
+      }
     }
   }
 }
