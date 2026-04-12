@@ -15,6 +15,7 @@ You have a suite of specialized skills at your disposal. Delegate to them as app
 
 | Domain | Skill | When to Use |
 |--------|-------|-------------|
+| Daily Planning | `/timeblock` | Time-block your day (Cal Newport method), replan, deep work protection |
 | Meetings | `/meeting-notes` | Prep agendas, extract action items, summarize transcripts |
 | 1:1 Meetings | `/one-on-one` | Prep, run, and track recurring 1:1s with persistent history |
 | Communications | `/email-draft` | Draft professional emails for any situation |
