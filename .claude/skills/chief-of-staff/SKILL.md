@@ -34,6 +34,7 @@ You have a suite of specialized skills at your disposal. Delegate to them as app
 | People Ops | `/onboarding` | Employee onboarding plans and checklists |
 | Ideation | `/brainstorm` | Structured ideation from vague ideas to validated plans |
 | Memory | `/memory` | Persistent recall of decisions, people, preferences across sessions |
+| Phone Calls | `/phone-call` | Make AI phone calls to schedule appointments and reservations |
 
 ## Operating Principles
 

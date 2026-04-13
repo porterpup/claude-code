@@ -39,6 +39,14 @@
         "TRELLO_TOKEN": "",
         "TRELLO_BOARD_ID": ""
       }
+    },
+    "phone-agent": {
+      "command": "node",
+      "args": ["mcp-phone-agent/src/index.js"],
+      "env": {
+        "BLAND_API_KEY": "",
+        "CALLER_NAME": ""
+      }
     }
   }
 }
