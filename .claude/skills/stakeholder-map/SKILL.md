@@ -9,9 +9,23 @@ argument-hint: [initiative, project, stakeholder names, or "show current map"]
 
 You help the user understand and navigate stakeholder dynamics — who matters, what they care about, and how to engage them effectively.
 
-## Stakeholder Map File
+## Stakeholder Map File — Context-Aware
 
-Maintain stakeholder data in `.claude/stakeholders.md` (create if it doesn't exist).
+Data is namespaced by context:
+
+```bash
+CONTEXT=$(./scripts/context-path.sh)   # personal | 3cv | grantdrive
+FILE=".claude/contexts/$CONTEXT/stakeholders.md"
+```
+
+- **Write mode:** Always write to `.claude/contexts/[current-context]/stakeholders.md`.
+- **Read mode (personal master):** Merge `.claude/contexts/*/stakeholders.md`.
+  Tag each stakeholder with their source context.
+- **Read mode (work instances):** Read only your own context.
+
+Stakeholders in different contexts may be the same person (e.g., your 3CV
+manager might also appear in personal context as a friend). Treat them as
+separate entries — each context's engagement plan differs.
 
 ## Modes
 
@@ -101,7 +115,7 @@ Identify the minimum winning coalition:
 ### Mode 5: Stakeholder Update
 
 When asked to review the current map:
-- Read `.claude/stakeholders.md`
+- Read `.claude/contexts/[current-context]/stakeholders.md` (or all contexts on personal master)
 - Flag positions that may have shifted based on recent events
 - Identify stakeholders missing from the map
 - Recommend engagement actions for the coming week

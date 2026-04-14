@@ -17,9 +17,24 @@ intentionality. When the plan breaks (and it will), you replan.
 > maintain a thoughtful say in what you're doing with your time going forward."
 > — Cal Newport
 
-## Plan Storage
+## Plan Storage — Context-Aware
 
-Maintain daily plans in `.claude/timeblock/YYYY-MM-DD.md` (create directory if needed).
+Daily plans are namespaced by context:
+
+```bash
+CONTEXT=$(./scripts/context-path.sh)   # personal | 3cv | grantdrive
+FILE=".claude/contexts/$CONTEXT/timeblock/YYYY-MM-DD.md"
+```
+
+- **Write mode:** Write to `.claude/contexts/[current-context]/timeblock/YYYY-MM-DD.md`.
+- **Personal master:** Generates a **unified daily plan** by reading all
+  three contexts' time-block files for the day, then overlaying them into a
+  single schedule. Color-code or tag blocks by context.
+- **Work instances:** Read only their own context's plan.
+
+Each context typically covers different hours of the day (e.g., 3CV = 9-5,
+Grant Drive = evenings, personal = weekends + evenings), but overlaps are
+possible and must be reconciled on the personal master.
 
 ## Plan Format
 

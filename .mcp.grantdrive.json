@@ -1,0 +1,16 @@
+{
+  "_comment": "Grant Drive context. Uses Microsoft 365 (Outlook) with --org-mode for work/school accounts. Fill in any additional backlog/task tools Grant Drive uses.",
+  "mcpServers": {
+    "claude-code-explorer": {
+      "command": "node",
+      "args": ["mcp-server/dist/index.js"],
+      "env": {
+        "CLAUDE_CODE_SRC_ROOT": "./src"
+      }
+    },
+    "ms365": {
+      "command": "npx",
+      "args": ["-y", "@softeria/ms-365-mcp-server", "--org-mode"]
+    }
+  }
+}

@@ -9,10 +9,28 @@ argument-hint: ["remember [fact]", "recall [topic]", "who is [person]", "what di
 
 You maintain long-term memory across sessions using memvid (preferred) or markdown files (fallback). This enables continuity — you remember decisions, people, preferences, and context from prior conversations.
 
-## Memory Storage
+## Memory Storage — Context-Aware
 
-**Primary (memvid):** `~/.chief-of-staff/memory.mv2`
-**Fallback (markdown):** `.claude/memory/` directory with categorized `.md` files
+Memory is namespaced by context (personal / 3cv / grantdrive).
+
+**Primary (memvid):** `.claude/contexts/[current-context]/memory.mv2`
+**Fallback (markdown):** `.claude/contexts/[current-context]/memory/` directory
+
+Determine the current context:
+```bash
+CONTEXT=$(./scripts/context-path.sh)   # personal | 3cv | grantdrive
+MEMVID=".claude/contexts/$CONTEXT/memory.mv2"
+MD_DIR=".claude/contexts/$CONTEXT/memory"
+```
+
+**Personal master aggregate search:** When on the personal master, you can
+query across all three contexts by running each search against all three
+memvid files and merging results (label each hit with its source context).
+
+**Work instances:** Only query/write within your own context's memvid/markdown.
+
+All memvid entries are additionally tagged with `context:[personal|3cv|grantdrive]`
+for consistency and future migration flexibility.
 
 On first use, check if memvid is available:
 ```bash
@@ -26,11 +44,13 @@ If memvid is not installed, use the markdown fallback. Never fail silently — t
 ### Store a Memory
 
 ```bash
-echo "[content]" | memvid put ~/.chief-of-staff/memory.mv2 \
+CONTEXT=$(./scripts/context-path.sh)
+echo "[content]" | memvid put ".claude/contexts/$CONTEXT/memory.mv2" \
   --title "[short title]" \
   --tag "type:[decision|stakeholder|meeting|preference|action|context]" \
   --tag "domain:[finance|engineering|people|strategy|operations|other]" \
-  --tag "project:[project-name]"
+  --tag "project:[project-name]" \
+  --tag "context:$CONTEXT"
 ```
 
 **Always tag with at least `type` and `domain`.** This enables precise filtering later.
@@ -39,39 +59,39 @@ echo "[content]" | memvid put ~/.chief-of-staff/memory.mv2 \
 
 ```bash
 # Hybrid search (best for most queries)
-memvid find ~/.chief-of-staff/memory.mv2 --query "[search terms]" --json
+memvid find ".claude/contexts/$CONTEXT/memory.mv2" --query "[search terms]" --json
 
 # Lexical search (exact matches, tag filtering)
-memvid find ~/.chief-of-staff/memory.mv2 --query "[exact terms]" --mode lex --json
+memvid find ".claude/contexts/$CONTEXT/memory.mv2" --query "[exact terms]" --mode lex --json
 
 # Semantic search (conceptual similarity)
-memvid find ~/.chief-of-staff/memory.mv2 --query "[concept]" --mode sem --json
+memvid find ".claude/contexts/$CONTEXT/memory.mv2" --query "[concept]" --mode sem --json
 
 # Time-filtered search
-memvid find ~/.chief-of-staff/memory.mv2 --query "[topic]" --as-of-ts "[YYYY-MM-DD]" --json
+memvid find ".claude/contexts/$CONTEXT/memory.mv2" --query "[topic]" --as-of-ts "[YYYY-MM-DD]" --json
 ```
 
 ### Entity/Stakeholder State
 
 ```bash
 # Get everything known about a person or entity
-memvid state ~/.chief-of-staff/memory.mv2 "[Person Name]"
+memvid state ".claude/contexts/$CONTEXT/memory.mv2" "[Person Name]"
 
 # Timeline of interactions
-memvid timeline ~/.chief-of-staff/memory.mv2
+memvid timeline ".claude/contexts/$CONTEXT/memory.mv2"
 ```
 
 ### Memory Maintenance
 
 ```bash
 # Stats
-memvid info ~/.chief-of-staff/memory.mv2
+memvid info ".claude/contexts/$CONTEXT/memory.mv2"
 
 # Verify integrity
-memvid verify ~/.chief-of-staff/memory.mv2
+memvid verify ".claude/contexts/$CONTEXT/memory.mv2"
 
 # Encrypt (if handling sensitive data)
-memvid lock ~/.chief-of-staff/memory.mv2
+memvid lock ".claude/contexts/$CONTEXT/memory.mv2"
 ```
 
 ## Markdown Fallback Backend
@@ -79,7 +99,7 @@ memvid lock ~/.chief-of-staff/memory.mv2
 If memvid is unavailable, use structured markdown files:
 
 ```
-.claude/memory/
+.claude/contexts/[context]/memory/
   decisions.md      # Decision log entries
   stakeholders.md   # People and relationship context
   preferences.md    # User preferences, working style, recurring instructions
@@ -97,7 +117,8 @@ Each entry format:
 ---
 ```
 
-Search via Grep across all files in `.claude/memory/`.
+Search via Grep across all files in `.claude/contexts/[current-context]/memory/`.
+(Personal master: grep across all `.claude/contexts/*/memory/`.)
 
 ## Modes
 
@@ -157,19 +178,24 @@ At the start of a conversation, if the user's query relates to a known topic:
 
 ## First-Time Setup
 
-If `~/.chief-of-staff/memory.mv2` doesn't exist:
+If the current context's memvid file doesn't exist:
 
 ```bash
-mkdir -p ~/.chief-of-staff
-memvid create ~/.chief-of-staff/memory.mv2
-echo "Chief of Staff memory initialized on $(date)" | memvid put ~/.chief-of-staff/memory.mv2 --title "System: Memory Initialized" --tag "type:context"
+CONTEXT=$(./scripts/context-path.sh)
+mkdir -p ".claude/contexts/$CONTEXT"
+memvid create ".claude/contexts/$CONTEXT/memory.mv2"
+echo "Memory initialized for context: $CONTEXT on $(date)" | \
+  memvid put ".claude/contexts/$CONTEXT/memory.mv2" \
+    --title "System: Memory Initialized" \
+    --tag "type:context" --tag "context:$CONTEXT"
 ```
 
 If memvid is not installed, create the markdown fallback:
 ```bash
-mkdir -p .claude/memory
+CONTEXT=$(./scripts/context-path.sh)
+mkdir -p ".claude/contexts/$CONTEXT/memory"
 for f in decisions stakeholders preferences meetings projects general; do
-  echo "# ${f^} Memory\n\n---\n" > ".claude/memory/${f}.md"
+  printf "# ${f^} Memory (%s)\n\n---\n" "$CONTEXT" > ".claude/contexts/$CONTEXT/memory/${f}.md"
 done
 ```
 

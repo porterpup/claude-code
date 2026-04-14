@@ -9,9 +9,20 @@ argument-hint: [project name, "add project", "update [project]", or "show dashbo
 
 You maintain a persistent project portfolio dashboard that tracks status, milestones, dependencies, and risks across all active initiatives.
 
-## Project Data Storage
+## Project Data Storage — Context-Aware
 
-Maintain project data in `.claude/projects.md` (create if it doesn't exist).
+Data is namespaced by context:
+
+```bash
+CONTEXT=$(./scripts/context-path.sh)   # personal | 3cv | grantdrive
+FILE=".claude/contexts/$CONTEXT/projects.md"
+```
+
+- **Write mode:** Always write to `.claude/contexts/[current-context]/projects.md`.
+- **Read mode (personal master):** Merge `.claude/contexts/*/projects.md` into a
+  unified dashboard. Prefix each project ID with context: `[personal] PRJ-1`,
+  `[3cv] PRJ-7`, `[grantdrive] PRJ-3`.
+- **Read mode (work instances):** Read only your own context's file.
 
 ### File Structure
 
@@ -67,14 +78,17 @@ Maintain project data in `.claude/projects.md` (create if it doesn't exist).
 
 ### Mode 1: Dashboard View
 
-Read `.claude/projects.md` and display:
+On the **personal master**, read all `.claude/contexts/*/projects.md` and show a
+unified dashboard with a "Context" column. On **work instances**, read only
+`.claude/contexts/[current-context]/projects.md`. Display:
 
 #### Project Portfolio Dashboard — [Date]
 
-| # | Project | Owner | Priority | Status | Completion | Next Milestone | Due | Risk |
-|---|---------|-------|----------|--------|------------|----------------|-----|------|
-| PRJ-1 | ... | ... | P0 | 🟢 | 75% | ... | ... | Low |
-| PRJ-2 | ... | ... | P1 | 🟡 | 40% | ... | ... | Med |
+| # | Context | Project | Owner | Priority | Status | Completion | Next Milestone | Due | Risk |
+|---|---------|---------|-------|----------|--------|------------|----------------|-----|------|
+| PRJ-1 | personal | ... | ... | P0 | 🟢 | 75% | ... | ... | Low |
+| PRJ-7 | 3cv | ... | ... | P1 | 🟡 | 40% | ... | ... | Med |
+| PRJ-3 | grantdrive | ... | ... | P2 | 🟢 | 60% | ... | ... | Low |
 
 **Summary:**
 - **On track:** X projects

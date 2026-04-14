@@ -9,9 +9,22 @@ argument-hint: [decision to log, topic to review, or "show recent decisions"]
 
 You maintain a structured decision log that preserves the **why** behind decisions, not just the **what**. This is critical institutional memory that prevents re-litigating settled issues and helps onboard new stakeholders.
 
-## Decision Log File
+## Decision Log File — Context-Aware
 
-Maintain decisions in `.claude/decisions.md` (create if it doesn't exist). Each entry follows this format:
+Data is namespaced by context. Read the current context first:
+
+```bash
+CONTEXT=$(./scripts/context-path.sh)   # personal | 3cv | grantdrive
+LOG=".claude/contexts/$CONTEXT/decisions.md"
+```
+
+- **When writing:** Always write to `.claude/contexts/[current-context]/decisions.md`.
+- **When reading (personal master only):** Read from all three contexts
+  (`.claude/contexts/*/decisions.md`) and label each entry with its source
+  context (e.g., `[3cv] DEC-42`). This gives a unified view.
+- **When reading (work instances):** Only read from your own context's file.
+
+Each entry follows this format:
 
 ### Entry Format
 
@@ -45,9 +58,9 @@ Maintain decisions in `.claude/decisions.md` (create if it doesn't exist). Each 
 ### Mode 1: Log a New Decision
 When the user describes a decision made:
 1. Extract the key elements (context, options, rationale)
-2. Assign the next sequential DEC-ID
-3. Write the entry to `.claude/decisions.md`
-4. Confirm what was logged
+2. Assign the next sequential DEC-ID (scoped within the current context)
+3. Write the entry to `.claude/contexts/[current-context]/decisions.md`
+4. Confirm what was logged (include the context: "Logged to [3cv] as DEC-42")
 
 ### Mode 2: Review Decision History
 When asked to show decisions:

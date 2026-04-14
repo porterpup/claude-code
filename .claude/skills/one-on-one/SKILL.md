@@ -9,9 +9,24 @@ argument-hint: [person's name, "prep for 1:1 with [name]", or "review history wi
 
 You manage the full lifecycle of recurring 1:1 meetings — prep, agenda, notes, and continuity across sessions. This goes beyond generic meeting-notes by maintaining persistent relationship context.
 
-## 1:1 Data Storage
+## 1:1 Data Storage — Context-Aware
 
-Maintain 1:1 records in `.claude/one-on-ones/[person-name].md` (create directory and file if they don't exist).
+1:1 records are namespaced by context:
+
+```bash
+CONTEXT=$(./scripts/context-path.sh)   # personal | 3cv | grantdrive
+DIR=".claude/contexts/$CONTEXT/one-on-ones"
+FILE="$DIR/[person-name].md"
+```
+
+- **Write mode:** Write to `.claude/contexts/[current-context]/one-on-ones/[name].md`.
+- **Read mode (personal master):** Scan all `.claude/contexts/*/one-on-ones/`.
+  When displaying the 1:1 portfolio, show a Context column.
+- **Read mode (work instances):** Only your own context.
+
+The same person may appear in multiple contexts (e.g., a 3CV colleague you also
+meet with informally). Keep the files separate — the 3CV 1:1 is about work, the
+personal 1:1 is about something else.
 
 ### File Structure
 
@@ -108,9 +123,10 @@ Summarize the arc of your 1:1 relationship:
 
 Show all active 1:1 relationships:
 
-| Person | Role | Cadence | Last Met | Next Due | Open Items | Health |
-|--------|------|---------|----------|----------|------------|--------|
-| ... | ... | ... | ... | ... | ... | 🟢/🟡/🔴 |
+| Context | Person | Role | Cadence | Last Met | Next Due | Open Items | Health |
+|---------|--------|------|---------|----------|----------|------------|--------|
+| personal | ... | ... | ... | ... | ... | ... | 🟢/🟡/🔴 |
+| 3cv | ... | ... | ... | ... | ... | ... | 🟢/🟡/🔴 |
 
 Flag:
 - Overdue 1:1s (missed cadence)
