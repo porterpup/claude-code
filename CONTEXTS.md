@@ -43,9 +43,14 @@ data trees into `main`.
 1. Clone the repo
 2. `git checkout context/3cv` (or `context/grantdrive`)
 3. `./scripts/switch-context.sh 3cv` (or `grantdrive`)
-4. Fill in credentials in `.mcp.3cv.json` (or `.mcp.grantdrive.json`)
-5. Start using Claude Code normally — data writes go to `contexts/[context]/`
-6. `git push` regularly — personal master will pull via `sync-contexts.sh`
+   - On first run, this creates `.mcp.3cv.json` from the committed template and exits.
+4. Edit the created `.mcp.3cv.json` (or `.mcp.grantdrive.json`) with real credentials.
+5. Run `./scripts/switch-context.sh 3cv` again to activate.
+6. Start using Claude Code normally — data writes go to `contexts/[context]/`
+7. `git push` regularly — personal master will pull via `sync-contexts.sh`
+
+**Credentials never get committed:** `.mcp.personal.json`, `.mcp.3cv.json`, and
+`.mcp.grantdrive.json` are gitignored. Only the `*.template` versions are in git.
 
 ## Data isolation
 

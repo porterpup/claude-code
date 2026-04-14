@@ -95,11 +95,24 @@ This:
 2. Checks out each context's `.claude/contexts/[name]/` tree into `main`
 3. Commits the merge to `main`
 
-## MCP Config Templates
+## MCP Config — Templates vs. Real Files
 
-Each context has its own template:
-- `.mcp.personal.json` — personal Google Workspace, personal Slack, personal Jira/Trello
-- `.mcp.3cv.json` — 3CV tools (fill in with 3CV's backlog, Slack, etc.)
-- `.mcp.grantdrive.json` — MS365 (--org-mode) for Outlook, Grant Drive systems
+Credentials never live in git. The scheme:
 
-`.mcp.json` itself is gitignored — it's a local copy of whichever template is active.
+| File | In Git? | Has Creds? | Purpose |
+|------|---------|------------|---------|
+| `.mcp.personal.json.template` | ✅ | No | Committed blueprint with empty credential fields |
+| `.mcp.personal.json` | ❌ (gitignored) | Yes | Local file with real credentials, per-machine |
+| `.mcp.json` | ❌ (gitignored) | Yes | Active copy, written by `switch-context.sh` |
+
+Same pattern for `3cv` and `grantdrive`.
+
+**First-time setup on a new machine:**
+```bash
+./scripts/switch-context.sh personal      # If .mcp.personal.json doesn't exist,
+                                           # this copies the template and exits.
+# Edit .mcp.personal.json with your real credentials.
+./scripts/switch-context.sh personal      # Run again — now it activates.
+```
+
+**Why not env vars?** MCP server configs in Claude Code don't do env substitution reliably. The per-context JSON file is the simplest thing that works.

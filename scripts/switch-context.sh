@@ -38,18 +38,30 @@ if [[ "$valid" != "true" ]]; then
   exit 1
 fi
 
-# Check the MCP template exists
-MCP_TEMPLATE="$REPO_ROOT/.mcp.${CONTEXT}.json"
-if [[ ! -f "$MCP_TEMPLATE" ]]; then
-  echo "Error: MCP template not found: $MCP_TEMPLATE"
-  exit 1
+# Locate the MCP config for this context.
+# Prefer the gitignored `.mcp.[ctx].json` (has real creds), fall back to
+# the committed `.mcp.[ctx].json.template` (empty creds — bootstrap case).
+MCP_CONFIG="$REPO_ROOT/.mcp.${CONTEXT}.json"
+MCP_TEMPLATE="$REPO_ROOT/.mcp.${CONTEXT}.json.template"
+
+if [[ ! -f "$MCP_CONFIG" ]]; then
+  if [[ -f "$MCP_TEMPLATE" ]]; then
+    echo "No .mcp.${CONTEXT}.json found — creating one from the template."
+    echo "Edit it and fill in credentials, then re-run this script."
+    cp "$MCP_TEMPLATE" "$MCP_CONFIG"
+    echo "  Created: $MCP_CONFIG"
+    exit 0
+  else
+    echo "Error: Neither .mcp.${CONTEXT}.json nor .mcp.${CONTEXT}.json.template exists."
+    exit 1
+  fi
 fi
 
 # Ensure context dir exists
 mkdir -p "$REPO_ROOT/.claude/contexts/$CONTEXT"
 
 # Copy MCP config
-cp "$MCP_TEMPLATE" "$REPO_ROOT/.mcp.json"
+cp "$MCP_CONFIG" "$REPO_ROOT/.mcp.json"
 
 # Update marker
 echo "$CONTEXT" > "$REPO_ROOT/.claude/current-context"
