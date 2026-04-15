@@ -148,7 +148,11 @@ def handle_event(client: SocketModeClient, req: SocketModeRequest) -> None:
     if req.type != "events_api":
         return
     event = req.payload.get("event", {})
-    if event.get("type") not in {"message", "app_mention"}:
+    # Only handle `message` events. Slack fires BOTH `app_mention` AND
+    # `message.channels` for the same @-mention; handling only `message`
+    # dedupes naturally while still covering DMs (message.im) and channel
+    # posts (message.channels / message.groups).
+    if event.get("type") != "message":
         return
     if not should_process(event):
         return
