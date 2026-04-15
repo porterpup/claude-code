@@ -112,26 +112,26 @@ def build_system_prompt() -> str:
 SYSTEM_PROMPT = build_system_prompt()
 
 
-ALLOWED_TOOLS = {
-    # @cos is a pure text orchestrator; no tool use needed, but Read lets it
-    # peek at context files if it wants.
-    "cos": "Read,Grep,Glob",
-    # @cos-notion only gets MCP tools + read access. No Write/Edit/Bash so it
-    # can't pollute the repo by writing helper scripts.
-    "cos-notion": "Read,Grep,Glob,mcp__notion__*",
+# Per-agent settings JSON with permissions.allow list. Claude's
+# --permission-mode bypassPermissions can't be used inside this sandbox
+# (it maps to --dangerously-skip-permissions which is blocked for root).
+# Instead we whitelist specific tools via the settings file so they
+# auto-approve without prompting.
+SETTINGS_FILES = {
+    "cos":        str(Path(__file__).parent / "agent-settings-cos.json"),
+    "cos-notion": str(Path(__file__).parent / "agent-settings-notion.json"),
 }
 
 
 def call_claude(user_text: str) -> str:
     """Invoke `claude -p` with agent persona; return stdout."""
-    allowed = ALLOWED_TOOLS.get(AGENT, "Read,Grep,Glob")
+    settings = SETTINGS_FILES.get(AGENT, SETTINGS_FILES["cos"])
     cmd = [
         "claude",
         "-p",
         user_text,
         "--append-system-prompt", SYSTEM_PROMPT,
-        "--permission-mode", "bypassPermissions",
-        "--allowed-tools", allowed,
+        "--settings", settings,
         "--output-format", "text",
     ]
     log.info(f"invoking claude (prompt={user_text[:120]!r})")
