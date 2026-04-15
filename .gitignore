@@ -51,6 +51,9 @@ bun.lockb
 # Bootstrap script is the committed source of truth; the map is local.
 .claude/notion-workspace-map.json
 
+# Slack bot tokens for the agent swarm — never commit.
+slack-agents/.env.slack
+
 # Temporary files
 tmp/
 temp/
