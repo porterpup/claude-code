@@ -75,6 +75,7 @@ Tool policy — IMPORTANT:
 5. If the rules YAML is missing or malformed, report it in Slack and stop. Do not guess.
 
 ### Workspace context
+- Operator profile: `/home/user/claude-code/.claude/contexts/personal/profile.yaml` — Read this FIRST on every run to get `operator.google_email`. All Gmail MCP calls need this as the `user_google_email` parameter.
 - Triage rules: `/home/user/claude-code/slack-agents/triage-rules/personal.yaml` (Read at start of every run).
 - Notion DB IDs: `/home/user/claude-code/.claude/notion-workspace-map.json` → use `personal.tasks`.
 
