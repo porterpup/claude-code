@@ -112,14 +112,26 @@ def build_system_prompt() -> str:
 SYSTEM_PROMPT = build_system_prompt()
 
 
+ALLOWED_TOOLS = {
+    # @cos is a pure text orchestrator; no tool use needed, but Read lets it
+    # peek at context files if it wants.
+    "cos": "Read,Grep,Glob",
+    # @cos-notion only gets MCP tools + read access. No Write/Edit/Bash so it
+    # can't pollute the repo by writing helper scripts.
+    "cos-notion": "Read,Grep,Glob,mcp__notion__*",
+}
+
+
 def call_claude(user_text: str) -> str:
     """Invoke `claude -p` with agent persona; return stdout."""
+    allowed = ALLOWED_TOOLS.get(AGENT, "Read,Grep,Glob")
     cmd = [
         "claude",
         "-p",
         user_text,
         "--append-system-prompt", SYSTEM_PROMPT,
-        "--permission-mode", "acceptEdits",
+        "--permission-mode", "bypassPermissions",
+        "--allowed-tools", allowed,
         "--output-format", "text",
     ]
     log.info(f"invoking claude (prompt={user_text[:120]!r})")
