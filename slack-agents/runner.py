@@ -120,6 +120,7 @@ SYSTEM_PROMPT = build_system_prompt()
 SETTINGS_FILES = {
     "cos":        str(Path(__file__).parent / "agent-settings-cos.json"),
     "cos-notion": str(Path(__file__).parent / "agent-settings-notion.json"),
+    "cos-inbox":  str(Path(__file__).parent / "agent-settings-inbox.json"),
 }
 
 
@@ -136,13 +137,16 @@ def call_claude(user_text: str) -> str:
     ]
     log.info(f"invoking claude (prompt={user_text[:120]!r})")
     start = time.time()
+    # Inbox triage walks through many emails + MCP calls and can take
+    # several minutes on a full 24h window.
+    timeout = 600 if AGENT == "cos-inbox" else 180
     try:
         result = subprocess.run(
             cmd,
             cwd=str(REPO_ROOT),
             capture_output=True,
             text=True,
-            timeout=180,
+            timeout=timeout,
         )
     except subprocess.TimeoutExpired:
         return "_(Claude call timed out after 3m.)_"
