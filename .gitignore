@@ -54,6 +54,10 @@ bun.lockb
 # Slack bot tokens for the agent swarm — never commit.
 slack-agents/.env.slack
 
+# Python bytecode caches
+__pycache__/
+*.pyc
+
 # Temporary files
 tmp/
 temp/
