@@ -1,0 +1,16 @@
+[Unit]
+Description=Chief of Staff Slack Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/claude-code/slack-bot
+ExecStart=%h/claude-code/slack-bot/.venv/bin/python bot.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

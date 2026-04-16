@@ -1,0 +1,163 @@
+# Triage rules for the Personal Gmail inbox.
+#
+# Rules are evaluated TOP-DOWN. First match wins. If no rule matches,
+# the email falls through to the LLM classifier (see @cos-inbox
+# system prompt) which picks a bucket based on the content.
+#
+# Each rule has:
+#   match:  criteria (from, subject_contains, body_contains, list_id, is_noreply)
+#   label:  Gmail label to apply (created if missing)
+#   skip_task_extraction:  true if we should never try to pull a task
+#                          out of emails matching this rule (e.g. newsletters)
+#   skip_draft:            true if we should never draft a reply
+#
+# Labels use a slash-separated hierarchy. Gmail renders these as nested
+# labels in the sidebar.
+
+rules:
+  # === Work / business =================================================
+  - name: 3CV work mail
+    match:
+      from_domain: [3cventures.com, 3cv.com]
+    label: Work/3CV
+    skip_task_extraction: false
+    skip_draft: false
+
+  - name: Grant Drive mail
+    match:
+      from_domain: [grantdrivegroup.com]
+    label: Work/GrantDrive
+    skip_task_extraction: false
+    skip_draft: false
+
+  # === Explicit action-required ========================================
+  - name: Airbnb host activity
+    match:
+      from_domain: [airbnb.com]
+      subject_contains: [reservation, message from, check-in]
+    label: Action/Airbnb
+    skip_task_extraction: false
+    skip_draft: false
+
+  - name: Calendar invites
+    match:
+      subject_contains: [invitation, calendar invite, "rsvp:"]
+    label: Action/Calendar
+    skip_task_extraction: false
+    skip_draft: true  # use calendar UI, not email reply
+
+  # === Financial / receipts ============================================
+  - name: Receipts
+    match:
+      subject_contains: [receipt, invoice, "your order", "payment received"]
+    label: Financial/Receipts
+    skip_task_extraction: true
+    skip_draft: true
+
+  - name: Bank / credit card statements
+    match:
+      from_domain:
+        - chase.com
+        - americanexpress.com
+        - capitalone.com
+        - bankofamerica.com
+        - wellsfargo.com
+      subject_contains: [statement, alert, balance]
+    label: Financial/Banking
+    skip_task_extraction: true
+    skip_draft: true
+
+  # === Recruiters / jobs ===============================================
+  - name: Recruiter / job matches
+    match:
+      from_domain:
+        - linkedin.com
+        - mckinsey.com
+        - indeed.com
+        - ziprecruiter.com
+      subject_contains: [job match, opportunity, role, position, "we're hiring"]
+    label: Career/Recruiters
+    skip_task_extraction: true  # too noisy; star manually if interested
+    skip_draft: true
+
+  # === Meeting recordings / transcripts ================================
+  - name: Fathom recordings
+    match:
+      from_domain: [fathom.video, fathom.ai]
+    label: Meetings/Recordings
+    skip_task_extraction: false  # recordings often have action items
+    skip_draft: true
+
+  - name: Zoom / Google Meet recordings
+    match:
+      subject_contains: [recording, transcript, meeting summary]
+    label: Meetings/Recordings
+    skip_task_extraction: false
+    skip_draft: true
+
+  # === Newsletters / promos (auto-labelled, never action) ==============
+  - name: No-reply sender
+    match:
+      is_noreply: true
+    label: Newsletters/Unsorted
+    skip_task_extraction: true
+    skip_draft: true
+
+  - name: Common marketing senders
+    match:
+      from_domain:
+        - substack.com
+        - mailchimp.com
+        - constantcontact.com
+        - hubspot.com
+    label: Newsletters/Marketing
+    skip_task_extraction: true
+    skip_draft: true
+
+  - name: List-Id header present
+    match:
+      has_list_id: true
+    label: Newsletters/Unsorted
+    skip_task_extraction: true
+    skip_draft: true
+
+# Labels that must exist before rules can apply them. Agent creates any
+# missing labels on first run.
+required_labels:
+  - Work/3CV
+  - Work/GrantDrive
+  - Action/Airbnb
+  - Action/Calendar
+  - Financial/Receipts
+  - Financial/Banking
+  - Career/Recruiters
+  - Meetings/Recordings
+  - Newsletters/Unsorted
+  - Newsletters/Marketing
+  - Inbox/Action
+  - Inbox/FYI
+  # State marker: applied to every email processed by `cleanup`. Used to
+  # make backlog sweeps idempotent across @-mentions (each Slack @-mention
+  # spawns a fresh process, so progress state has to live in Gmail itself).
+  - Triaged/Backlog
+
+# Emails matching these get a task proposal (unless skip_task_extraction=true).
+# The LLM decides if the email contains an action item; this is just a filter.
+task_extraction:
+  action_verbs:
+    - please
+    - can you
+    - could you
+    - need you to
+    - by {date}
+    - deadline
+    - action required
+    - rsvp
+    - confirm
+    - review
+    - approve
+
+# Draft generation preferences.
+drafts:
+  style: "brief, friendly, no emoji, no 'hope you're well', direct"
+  signature: "— Porter"

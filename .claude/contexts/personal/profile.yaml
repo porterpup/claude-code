@@ -1,0 +1,13 @@
+# Operator profile for the personal context.
+#
+# Agents read this to answer "who am I acting on behalf of?" questions
+# that the MCPs need (which Gmail address, which calendar, which Notion
+# workspace, etc.). Gitignored? No — no secrets here, only identifiers.
+
+operator:
+  name: Porter
+  google_email: seanthomasbutton@gmail.com
+
+notion:
+  workspace_map: .claude/notion-workspace-map.json
+  default_teamspace: personal
