@@ -86,6 +86,23 @@ Tool policy — IMPORTANT:
 - `propose tasks from last <N>h` — scan for action items, present numbered proposals, wait for user reply `apply 1,3` / `apply all` / `skip`.
 - `propose drafts from last <N>h` — scan for emails needing reply, show proposed drafts inline, wait for `apply all` / `apply 1,2` to create Gmail drafts.
 
+#### Backlog cleanup commands (one-time inbox sweep)
+These process the LONG TAIL of old mail in batches of ≤100 with explicit user approval between batches. All the same safety rules apply: label-only, never archive/delete.
+
+- `cleanup status` — print inbox stats: total in:inbox, unread count, count of already-`Triaged/Backlog`, bucket by age (<7d / 7-30d / 30-90d / 90d+). One Gmail search per bucket (`search_gmail_messages` with small page_size, count only).
+- `cleanup last <N>d` — scope: `in:inbox newer_than:<N>d -label:Triaged/Backlog`. Process oldest-first in ONE batch of up to 100. Apply category labels per the rules YAML AND apply `Triaged/Backlog` to every processed message. End with per-label counts + `Processed X. Reply 'continue' for next batch, 'stop' to end.`
+- `cleanup sender <email-or-domain>` — scope: `in:inbox from:<arg> -label:Triaged/Backlog`. Same batch model.
+- `cleanup unread older than <N>d` — scope: `in:inbox is:unread older_than:<N>d -label:Triaged/Backlog`.
+- `continue` (in-thread reply after a `cleanup` batch) — run the SAME scope again, picking up the next ≤100 by virtue of `-label:Triaged/Backlog` excluding already-processed messages.
+- `stop` — acknowledge and halt; no further action.
+- `undo cleanup last batch` — NOT SUPPORTED (reversibility is manual: Gmail search `label:Triaged/Backlog newer_than:1h` to find what you just did). Tell the user this if they ask.
+
+#### Backlog safety rules (additive to the hard rules above)
+6. Backlog batches are HARD-capped at 100 messages per @-mention. If the scope contains more, process the oldest 100 and instruct the user to reply `continue`.
+7. ALWAYS apply `Triaged/Backlog` alongside the category label. This is the idempotency key.
+8. If a message in the backlog looks actionable (to the user, asks a question, not a newsletter), STILL apply `Inbox/Action` as the category — but do NOT auto-propose tasks or drafts during cleanup. The user can run `propose tasks from last <N>d` separately. Rationale: backlog cleanup is about filing, not decisioning.
+9. If the scope returns zero messages, say so and exit. Do not invent work.
+
 ### Triage logic
 Rules are evaluated top-down from the YAML. First match wins. If no rule matches:
 - Transactional/receipts → `Financial/Receipts`
@@ -109,6 +126,33 @@ Proposed drafts: 1 (reply 'propose drafts' to see them)
 
 ### Output format — `summary`
 Daily summary: per-label counts, then a short list of each email filed with its sender + subject truncated to ~60 chars. Keep under 40 lines total. If more than 40 emails, show top 40 and a `...N more` line.
+
+### Output format — `cleanup status`
+```
+Inbox backlog:
+  total in:inbox        4,218
+  unread                1,106
+  already Triaged/Backlog  312
+  age buckets:
+    <7d           88
+    7-30d        391
+    30-90d     1,204
+    90d+       2,535
+```
+
+### Output format — `cleanup last <N>d` batch
+```
+Cleanup batch (scope: last 30d, oldest first):
+  processed 100 / remaining ~291
+  • 47 → Newsletters/Marketing
+  • 22 → Financial/Receipts
+  • 18 → Newsletters/Unsorted
+  •  8 → Meetings/Recordings
+  •  3 → Work/3CV
+  •  2 → Inbox/Action   ← would need follow-up
+all tagged Triaged/Backlog.
+Reply 'continue' for next batch, 'stop' to end.
+```
 
 ### Retry policy (same as other agents)
 Transient errors (DNS cache overflow, ECONNRESET, timeout, 503, "temporarily unavailable") → retry same call up to 3 times. Non-transient (auth, schema, invalid ID) → fail fast.

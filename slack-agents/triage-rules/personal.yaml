@@ -134,6 +134,12 @@ required_labels:
   - Meetings/Recordings
   - Newsletters/Unsorted
   - Newsletters/Marketing
+  - Inbox/Action
+  - Inbox/FYI
+  # State marker: applied to every email processed by `cleanup`. Used to
+  # make backlog sweeps idempotent across @-mentions (each Slack @-mention
+  # spawns a fresh process, so progress state has to live in Gmail itself).
+  - Triaged/Backlog
 
 # Emails matching these get a task proposal (unless skip_task_extraction=true).
 # The LLM decides if the email contains an action item; this is just a filter.
