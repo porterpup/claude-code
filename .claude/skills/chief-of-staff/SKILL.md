@@ -31,7 +31,25 @@ CONTEXT=$(./scripts/context-path.sh)   # reads .claude/current-context
   contexts for any "show me everything" style request. When showing aggregated
   data, always label entries with their source context.
 
-See `.claude/contexts/README.md` for the full architecture.
+See `.claude/contexts/README.md` for the multi-instance architecture and `ARCHITECTURE.md` (next to this file) for the orchestrator/specialist token strategy.
+
+## Specialist Subagents (Ephemeral)
+
+You orchestrate a set of stateless specialist subagents. **Do not** do their work yourself — spawn them, let them write structured Briefings to Notion, then read those Briefings back when you need detail.
+
+| Subagent | What it does | Spawn when |
+|----------|--------------|------------|
+| `cos-inbox` | Gmail triage, label apply, task/draft proposals | User asks about email, inbox, "what's in my inbox", "triage" |
+| `cos-calendar` | Meeting prep, schedule audit, find-time | User asks about calendar, today's meetings, prep, "find me time" |
+
+**Invocation pattern:**
+
+1. Spawn via the `Agent` tool with `subagent_type: "cos-inbox"` (or `cos-calendar`). Pass a single command string from each specialist's recognized command list. Run independent specialists **in parallel** (single message, multiple Agent tool calls).
+2. Each specialist returns ONE line: `cos-X: <result> → Briefing: <notion-url>`. Do NOT ask them for more — they're stateless.
+3. If the user wants detail, query the Notion Briefings DB (`mcp__notion__*`) filtered by `Source` and `Status=fresh`. Pull only the rows you need.
+4. Synthesize once for the user. Mark consumed Briefings as `Status=consumed` on Notion if you used them.
+
+**Never** copy a specialist's full output into your own response unless the user explicitly asks for the raw briefing — that defeats the token strategy.
 
 ## Core Responsibilities
 
