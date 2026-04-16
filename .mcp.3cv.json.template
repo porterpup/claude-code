@@ -1,0 +1,40 @@
+{
+  "_comment": "3CV W2 job context. Fill in credentials for whatever tools 3CV uses. If 3CV uses Google Workspace, configure google-workspace. If Outlook, configure ms365. If Jira, Confluence, Trello — configure those.",
+  "mcpServers": {
+    "claude-code-explorer": {
+      "command": "node",
+      "args": ["mcp-server/dist/index.js"],
+      "env": {
+        "CLAUDE_CODE_SRC_ROOT": "./src"
+      }
+    },
+    "google-workspace": {
+      "command": "uvx",
+      "args": ["workspace-mcp", "--tool-tier", "core"],
+      "env": {
+        "GOOGLE_OAUTH_CLIENT_ID": "",
+        "GOOGLE_OAUTH_CLIENT_SECRET": ""
+      }
+    },
+    "atlassian": {
+      "command": "uvx",
+      "args": ["mcp-atlassian"],
+      "env": {
+        "JIRA_URL": "",
+        "JIRA_USERNAME": "",
+        "JIRA_API_TOKEN": "",
+        "CONFLUENCE_URL": "",
+        "CONFLUENCE_USERNAME": "",
+        "CONFLUENCE_API_TOKEN": ""
+      }
+    },
+    "notion": {
+      "_comment": "Points at the 3CV teamspace in the shared personal Notion workspace. Uses the same integration token as personal; the integration must be shared into the 3CV teamspace.",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\":\"Bearer YOUR_NOTION_INTEGRATION_TOKEN\",\"Notion-Version\":\"2022-06-28\"}"
+      }
+    }
+  }
+}

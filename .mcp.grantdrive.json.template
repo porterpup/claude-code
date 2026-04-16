@@ -1,0 +1,24 @@
+{
+  "_comment": "Grant Drive context. Uses Microsoft 365 (Outlook) with --org-mode for work/school accounts. Fill in any additional backlog/task tools Grant Drive uses.",
+  "mcpServers": {
+    "claude-code-explorer": {
+      "command": "node",
+      "args": ["mcp-server/dist/index.js"],
+      "env": {
+        "CLAUDE_CODE_SRC_ROOT": "./src"
+      }
+    },
+    "ms365": {
+      "command": "npx",
+      "args": ["-y", "@softeria/ms-365-mcp-server", "--org-mode"]
+    },
+    "notion": {
+      "_comment": "Points at the Grant Drive teamspace in the shared personal Notion workspace. Uses the same integration token as personal; the integration must be shared into the Grant Drive teamspace.",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\":\"Bearer YOUR_NOTION_INTEGRATION_TOKEN\",\"Notion-Version\":\"2022-06-28\"}"
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "claude-code-explorer": {
+      "command": "node",
+      "args": ["mcp-server/dist/index.js"],
+      "env": {
+        "CLAUDE_CODE_SRC_ROOT": "./src"
+      }
+    },
+    "google-workspace": {
+      "command": "uvx",
+      "args": ["workspace-mcp", "--tool-tier", "core"],
+      "env": {
+        "GOOGLE_OAUTH_CLIENT_ID": "",
+        "GOOGLE_OAUTH_CLIENT_SECRET": ""
+      }
+    },
+    "notion": {
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\":\"Bearer YOUR_NOTION_INTEGRATION_TOKEN\",\"Notion-Version\":\"2022-06-28\"}"
+      }
+    },
+    "phone-agent": {
+      "command": "node",
+      "args": ["mcp-phone-agent/src/index.js"],
+      "env": {
+        "BLAND_API_KEY": "",
+        "CALLER_NAME": ""
+      }
+    }
+  }
+}
