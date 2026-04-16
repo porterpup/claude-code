@@ -18,6 +18,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -124,37 +125,45 @@ SETTINGS_FILES = {
 }
 
 
+# Serialize claude -p calls: each subprocess spins up MCP servers that
+# use ~10GB RSS. Concurrent calls OOM the sandbox.
+_claude_lock = threading.Lock()
+
+
 def call_claude(user_text: str) -> str:
     """Invoke `claude -p` with agent persona; return stdout."""
-    settings = SETTINGS_FILES.get(AGENT, SETTINGS_FILES["cos"])
-    cmd = [
-        "claude",
-        "-p",
-        user_text,
-        "--append-system-prompt", SYSTEM_PROMPT,
-        "--settings", settings,
-        "--output-format", "text",
-    ]
-    log.info(f"invoking claude (prompt={user_text[:120]!r})")
-    start = time.time()
-    # Inbox triage walks through many emails + MCP calls and can take
-    # several minutes on a full 24h window.
-    timeout = 600 if AGENT == "cos-inbox" else 180
+    if not _claude_lock.acquire(timeout=0):
+        return "_(busy — another request is in progress, try again in a minute)_"
     try:
-        result = subprocess.run(
-            cmd,
-            cwd=str(REPO_ROOT),
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-    except subprocess.TimeoutExpired:
-        return "_(Claude call timed out after 3m.)_"
-    dt = time.time() - start
-    log.info(f"claude returned in {dt:.1f}s, rc={result.returncode}")
-    if result.returncode != 0:
-        return f"_(Claude errored rc={result.returncode}: {result.stderr[:400]})_"
-    return (result.stdout or "").strip() or "_(Claude returned empty output.)_"
+        settings = SETTINGS_FILES.get(AGENT, SETTINGS_FILES["cos"])
+        cmd = [
+            "claude",
+            "-p",
+            user_text,
+            "--append-system-prompt", SYSTEM_PROMPT,
+            "--settings", settings,
+            "--output-format", "text",
+        ]
+        log.info(f"invoking claude (prompt={user_text[:120]!r})")
+        start = time.time()
+        timeout = 600 if AGENT == "cos-inbox" else 180
+        try:
+            result = subprocess.run(
+                cmd,
+                cwd=str(REPO_ROOT),
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            return "_(Claude call timed out.)_"
+        dt = time.time() - start
+        log.info(f"claude returned in {dt:.1f}s, rc={result.returncode}")
+        if result.returncode != 0:
+            return f"_(Claude errored rc={result.returncode}: {result.stderr[:400]})_"
+        return (result.stdout or "").strip() or "_(Claude returned empty output.)_"
+    finally:
+        _claude_lock.release()
 
 
 def handle_event(client: SocketModeClient, req: SocketModeRequest) -> None:
