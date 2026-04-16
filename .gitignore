@@ -62,4 +62,34 @@ __pycache__/
 tmp/
 temp/
 
+# Original repo files — not part of this project
+src/
+web/
+docker/
+docs/
+mcp-server/
+mcp-phone-agent/
+slack-bot/
+.github/
+.vscode/
+package.json
+package-lock.json
+bun.lock
+bunfig.toml
+biome.json
+tsconfig.json
+vercel.json
+server.json
+Dockerfile
+.dockerignore
+.env.example
+README.md
+CONTRIBUTING.md
+LICENSE
+CONTEXTS.md
+CHIEF_OF_STAFF_SKILLS_RESEARCH.md
+Skill.md
+agent.md
+gitpretty-apply.sh
+
 
