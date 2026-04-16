@@ -147,6 +147,8 @@ def call_claude(user_text: str) -> str:
         log.info(f"invoking claude (prompt={user_text[:120]!r})")
         start = time.time()
         timeout = 600 if AGENT == "cos-inbox" else 180
+        env = os.environ.copy()
+        env["GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE"] = "/tmp/gws-creds.json"
         try:
             result = subprocess.run(
                 cmd,
@@ -154,6 +156,7 @@ def call_claude(user_text: str) -> str:
                 capture_output=True,
                 text=True,
                 timeout=timeout,
+                env=env,
             )
         except subprocess.TimeoutExpired:
             return "_(Claude call timed out.)_"

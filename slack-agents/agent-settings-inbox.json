@@ -4,6 +4,7 @@
       "Read",
       "Grep",
       "Glob",
+      "Bash",
       "mcp__google-workspace",
       "mcp__notion"
     ],
@@ -12,7 +13,6 @@
       "Edit",
       "MultiEdit",
       "NotebookEdit",
-      "Bash",
       "WebFetch",
       "WebSearch"
     ]
