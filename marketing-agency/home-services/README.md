@@ -12,6 +12,15 @@ contractors and acquires its own clients through an automated outreach engine.
 - **[02-automation-workflow.md](./02-automation-workflow.md)** — The two automation engines
   (Client Acquisition + Delivery), the full tech stack, build order, and the compliance/
   deliverability guardrails that keep you out of trouble.
+- **[03-outreach-sequences.md](./03-outreach-sequences.md)** — The cold outreach playbook: the
+  5-touch email sequence, AI-voice/cold-call scripts with objection handling, the per-prospect
+  personalization variables, the audit asset spec, and the deliverability checklist.
+- **[04-financial-model.md](./04-financial-model.md)** — Acquisition funnel math, per-client unit
+  economics (CAC, LTV, margin), a conservative 12-month MRR ramp to ~$143k/mo, and the four levers
+  that actually move the model.
+- **[05-automation-build-specs.md](./05-automation-build-specs.md)** — Make.com/n8n
+  trigger→steps→output specs for every scenario in both engines (A1–A5 acquisition, B0–B6
+  delivery), plus architecture gotchas and the recommended build order.
 
 ## The thesis in three sentences
 
@@ -24,7 +33,10 @@ contractors and acquires its own clients through an automated outreach engine.
 
 ## Suggested next builds
 
-- The actual **cold-email + AI-voice outreach sequences** (copy + per-prospect personalization logic)
-- A **financial model** (CAC → clients → MRR projection)
-- The **Make.com / n8n scenario specs** to implement Engine A & B
-- **Health sector** adaptation (dental/ortho/eye/chiro/IVF) — same spine, HIPAA-compliant wrapper
+- ✅ ~~Cold-email + AI-voice outreach sequences~~ → see doc 03
+- ✅ ~~Financial model (CAC → clients → MRR projection)~~ → see doc 04
+- ✅ ~~Make.com / n8n scenario specs for Engine A & B~~ → see doc 05
+- ⬜ **Health sector** adaptation (dental/ortho/eye/chiro/IVF) — same spine, HIPAA-compliant wrapper
+- ⬜ **Sales call script / discovery framework** for closing booked calls into clients
+- ⬜ **Onboarding SOP + intake form** (the operational checklist behind scenario B0)
+- ⬜ **Case study & proof-asset templates** to lift outreach reply and close rates
