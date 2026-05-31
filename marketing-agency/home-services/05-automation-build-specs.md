@@ -135,3 +135,22 @@ to cut cost). GoHighLevel (GHL) is the CRM/messaging hub throughout.
 2. **B6** reporting (clients must *see* the ROI or they churn).
 3. **A1–A5** acquisition engine once you've run delivery manually for 1–2 clients.
 4. **B2 + B5 + AI receptionist** as you move clients to Tier 2.
+
+## Day-one vs. add-later (orchestration layer)
+
+You do **not** need a full Make.com/n8n build to start. Lean on GoHighLevel native workflows
+first; add the orchestration layer only when a scenario actually requires cross-tool plumbing.
+
+**Day one (no/minimal Make — runs inside GHL or its native integrations):**
+- B1 Missed-Call Text-Back · B4 Database Reactivation · B5 Lead Nurture · A4 reply→booking — all
+  native GHL workflows.
+- B3 Review Engine *if* you trigger it manually or via GHL's own "job complete" tag at first.
+
+**Add later (this is where Make/n8n earns its keep):**
+- B3 Review Engine via **client CRM webhook** (ServiceTitan/Housecall Pro/Jobber → Make) — needed
+  once clients want it fully hands-off.
+- B6 cross-platform **reporting aggregation** (GBP + CallRail + ads + GHL → Looker).
+- A1–A3 **scraping → Clay enrichment → audit generation → outreach dispatch** pipeline.
+- B2 Speed-to-Lead auto-dial bridge and AI receptionist.
+
+Self-host n8n only once you're past ~15 clients and scenarios are stable (cost optimization).
