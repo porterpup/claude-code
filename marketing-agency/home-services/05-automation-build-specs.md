@@ -154,3 +154,46 @@ first; add the orchestration layer only when a scenario actually requires cross-
 - B2 Speed-to-Lead auto-dial bridge and AI receptionist.
 
 Self-host n8n only once you're past ~15 clients and scenarios are stable (cost optimization).
+
+---
+
+## Claude-as-the-brain (MCP) architecture
+
+You can run *most of the interesting work* through Claude instead of building it all as static
+Make/n8n logic — but only the parts that need **judgment or content generation**. The high-volume
+transactional sends stay deterministic. Split the system into two layers:
+
+| Layer | Role | What lives here |
+|---|---|---|
+| **The brain** — Claude (Agent SDK + MCP servers) | Decide *what* to do; write the content | Audit generation (A2), inbound reply triage, lead research/scoring (A1), report narratives (B6), ad-hoc ops |
+| **The nervous system** — thin deterministic layer (GHL native → n8n later) | Catch events; fire fixed/templated actions reliably | Missed-call text-back (B1), speed-to-lead dial (B2), review-on-job-complete (B3), scheduled reactivation (B4), billing |
+
+### The pattern
+
+```mermaid
+flowchart LR
+    E[Event: webhook / schedule] --> T[Thin trigger layer\nGHL native or n8n\nreliability + speed + templates]
+    T -->|smart step needed| C[Claude\nAgent SDK + MCP tools]
+    C -->|acts via MCP, returns result| T
+    T --> D[Deliver: SMS / email / CRM update / report]
+```
+
+All **decisions and content** route through Claude; only **triggering and guaranteed delivery**
+stay deterministic. n8n has a native node to call Claude, so the handoff is clean.
+
+### Why the transactional sends stay OUT of Claude
+
+1. **Latency & cost** — B1 must fire in <60s and runs thousands of times/month; an LLM call per
+   event is slower and costs a token call for zero added value (the message is a fixed template).
+2. **Determinism** — these must fire the same way every time; a deterministic workflow does.
+3. **Hallucination/compliance risk** — never let a generative model free-text a quote or promise
+   into a customer's SMS. Templates for transactional touches, generation for judgment.
+
+### Two practical cautions (early 2026)
+
+1. **Most of these SaaS have no official MCP server yet** (GHL, ServiceTitan, Housecall Pro, Twilio,
+   Clay). You'd use community servers or, more likely, build thin MCP wrappers around their REST
+   APIs yourself — real maintenance work to weigh against Make/n8n's prebuilt connectors.
+2. **You still need a host/runtime.** "Through Claude" means the Agent SDK running as a service,
+   triggered by events. You're not removing the orchestration layer — you're making Claude the
+   brain inside it.
